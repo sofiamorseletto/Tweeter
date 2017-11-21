@@ -1,7 +1,11 @@
 package service
 
-var Tweet string
+var tweet2 string
 
 func PublishTweet(tweet string) {
-	Tweet = tweet
+	tweet2 = tweet
+}
+
+func GetTweet() string {
+	return tweet2
 }
