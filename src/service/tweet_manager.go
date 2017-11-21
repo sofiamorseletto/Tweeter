@@ -9,3 +9,7 @@ func PublishTweet(tweet string) {
 func GetTweet() string {
 	return tweet2
 }
+
+func CleanTweet() {
+	tweet2 = ""
+}
