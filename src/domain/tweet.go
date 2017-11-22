@@ -6,6 +6,7 @@ type Tweet struct {
 	User string
 	Text string
 	Date *time.Time
+	Id   int
 }
 
 func NewTweet(User string, Text string) *Tweet {
@@ -16,6 +17,7 @@ func NewTweet(User string, Text string) *Tweet {
 		User,
 		Text,
 		&date,
+		0,
 	}
 	return &t
 }

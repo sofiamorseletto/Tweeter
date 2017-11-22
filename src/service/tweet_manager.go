@@ -8,25 +8,30 @@ import (
 )
 
 var tweets []*domain.Tweet
+var id int
 
 func InitializeService() {
 
 	tweets = make([]*domain.Tweet, 0)
+	id = 0
 
 }
 
-func PublishTweet(tweet *domain.Tweet) error {
+func PublishTweet(tweet *domain.Tweet) (int, error) {
 	if tweet.User == "" {
-		return fmt.Errorf("user is required")
+		return 0, fmt.Errorf("user is required")
 	}
 	if tweet.Text == "" {
-		return fmt.Errorf("text is required")
+		return 0, fmt.Errorf("text is required")
 	}
 	if utf8.RuneCountInString(tweet.Text) > 140 {
-		return fmt.Errorf("text exceeds 140 characters")
+		return 0, fmt.Errorf("text exceeds 140 characters")
 	}
+	tweet.Id = id
 	tweets = append(tweets, tweet)
-	return nil
+	id = id + 1
+
+	return tweet.Id, nil
 }
 
 func GetTweet() *domain.Tweet {
@@ -40,6 +45,16 @@ func GetTweets() []*domain.Tweet {
 	return tweets
 }
 
+func GetTweetById(id int) *domain.Tweet {
+	for _, tweet := range tweets {
+		if tweet.Id == id {
+			return tweet
+		}
+	}
+	return nil
+}
+
 func CleanTweets() {
 	tweets = make([]*domain.Tweet, 0)
+	id = 0
 }

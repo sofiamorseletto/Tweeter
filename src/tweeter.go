@@ -16,6 +16,7 @@ func main() {
 		Help: "Publishes a tweet",
 		Func: func(c *ishell.Context) {
 			var tweet *domain.Tweet
+			var id int
 
 			defer c.ShowPrompt(true)
 
@@ -29,11 +30,11 @@ func main() {
 
 			tweet = domain.NewTweet(user, text)
 
-			err := service.PublishTweet(tweet)
+			id, err := service.PublishTweet(tweet)
 			if err != nil {
 				c.Print("Error publishing tweet:", err)
 			} else {
-				c.Print("Tweet sent\n")
+				c.Printf("Tweet sent with id: %v\n", id)
 			}
 
 			return

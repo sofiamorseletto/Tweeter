@@ -66,7 +66,7 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err != nil && err.Error() != "user is required" {
@@ -87,7 +87,7 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err == nil {
@@ -112,7 +112,7 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err == nil {
@@ -155,17 +155,67 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 	firstPublishedTweet := publishedTweets[0]
 	secondPublishedTweet := publishedTweets[1]
 
-	if !isValidTweet(t, firstPublishedTweet, user, text) {
+	if !isValidTweet(t, firstPublishedTweet, 0, user, text) {
 		return
 	}
 
-	if !isValidTweet(t, secondPublishedTweet, user, secondText) {
+	if !isValidTweet(t, secondPublishedTweet, 1, user, secondText) {
 		return
 	}
 
 }
 
-func isValidTweet(t *testing.T, tweet *domain.Tweet, user, text string) bool {
+func TestCanRetrieveTweetById(t *testing.T) {
+
+	// Initialization
+	service.InitializeService()
+
+	var tweet *domain.Tweet
+	var id int
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
+
+	// Operation
+	id, _ = service.PublishTweet(tweet)
+
+	// Validation
+	publishedTweet := service.GetTweetById(id)
+
+	isValidTweet(t, publishedTweet, id, user, text)
+}
+
+func TestCannotRetrieveTweetById(t *testing.T) {
+
+	// Initialization
+	service.InitializeService()
+
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
+
+	// Operation
+	service.PublishTweet(tweet)
+
+	// Validation
+	publishedTweet := service.GetTweetById(15)
+
+	if publishedTweet != nil {
+		t.Errorf("Deberia devolver nil")
+		return
+	}
+}
+
+func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) bool {
+
+	if tweet.Id != id {
+		t.Errorf("Expected id is %v but was %v", id, tweet.Id)
+	}
 
 	if tweet.User != user && tweet.Text != text {
 		t.Errorf("Expected tweet is %s: %s \nbut is %s: %s",
