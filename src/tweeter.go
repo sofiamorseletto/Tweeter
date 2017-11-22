@@ -29,9 +29,11 @@ func main() {
 
 			tweet = domain.NewTweet(user, text)
 
-			service.PublishTweet(tweet)
-
-			c.Print("Tweet sent\n")
+			if service.PublishTweet(tweet) != nil {
+				c.Print("Tweet must have an user\n")
+			} else {
+				c.Print("Tweet sent\n")
+			}
 
 			return
 		},
