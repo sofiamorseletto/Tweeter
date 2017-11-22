@@ -58,3 +58,14 @@ func CleanTweets() {
 	tweets = make([]*domain.Tweet, 0)
 	id = 0
 }
+
+func CountTweetsByUser(user string) int {
+	cant := 0
+
+	for _, tweet := range tweets {
+		if tweet.User == user {
+			cant = cant + 1
+		}
+	}
+	return cant
+}
