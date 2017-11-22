@@ -72,3 +72,51 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 	}
 
 }
+
+func TestTweetWithoutTextIsNotPublished(t *testing.T) {
+	//Initialization
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	var text string
+
+	tweet = domain.NewTweet(user, text)
+
+	//Operation
+	var err error
+	err = service.PublishTweet(tweet)
+
+	//Validation
+	if err == nil {
+		t.Error("Expected error")
+		return
+	}
+
+	if err.Error() != "text is required" {
+		t.Error("Expected error is text is required")
+	}
+}
+
+func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
+	//Initialization
+	var tweet *domain.Tweet
+
+	user := "grupoesfera"
+	text := `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+
+	tweet = domain.NewTweet(user, text)
+
+	//Operation
+	var err error
+	err = service.PublishTweet(tweet)
+
+	//Validation
+	if err == nil {
+		t.Error("Expected error")
+		return
+	}
+
+	if err.Error() != "text exceeds 140 characters" {
+		t.Error("Expected error is text exceeds 140 characters")
+	}
+}
