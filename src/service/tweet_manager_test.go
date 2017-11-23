@@ -292,3 +292,39 @@ func TestFollowUser(t *testing.T) {
 	}
 
 }
+
+func TestCanGetTrendingTopic(t *testing.T) {
+
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "Hola va"
+	secondText := "Hola como va"
+	thirdText := "Hola"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, thirdText)
+
+	firstId, _ := tweetManager.PublishTweet(tweet)
+	secondId, _ := tweetManager.PublishTweet(secondTweet)
+	tweetManager.PublishTweet(thirdTweet)
+
+	// Operation
+	primera, segunda := tweetManager.GetTrendingTopic(user)
+
+	// Validation
+	if primera != "Hola" {
+		t.Errorf("Expected word was Hola but is %s", primera)
+		return
+	}
+	if segunda != "va" {
+		t.Errorf("Expected word was va but is %s", segunda)
+		return
+	}
+
+}

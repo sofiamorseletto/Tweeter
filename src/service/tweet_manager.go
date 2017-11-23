@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/Tweeter/src/domain"
@@ -10,6 +11,7 @@ import (
 type TweetManager struct {
 	tweets []*domain.Tweet
 	users  map[string]*domain.User
+	words  map[string]int
 	id     int
 }
 
@@ -17,6 +19,7 @@ func NewTweetManager() *TweetManager {
 	tm := TweetManager{
 		make([]*domain.Tweet, 0),
 		make(map[string]*domain.User),
+		make(map[string]int),
 		0,
 	}
 	return &tm
@@ -42,6 +45,11 @@ func (tweetManager *TweetManager) PublishTweet(tweet *domain.Tweet) (int, error)
 		user := domain.NewUser(tweet.User)
 		user.Tweets = append(user.Tweets, tweet)
 		tweetManager.users[user.Name] = user
+	}
+
+	tweetWords := strings.Fields(tweet.Text)
+	for _, word := range tweetWords {
+		tweetManager.words[word] = tweetManager.words[word] + 1
 	}
 
 	tweetManager.id++
@@ -109,4 +117,8 @@ func (tweetManager *TweetManager) GetTimeLine(user string) []*domain.Tweet {
 	}
 
 	return followingTweets
+}
+
+func (tweetManager *TweetManager) GetTrendingTopic() (string, string) {
+
 }
