@@ -285,6 +285,38 @@ func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 
 }
 
+func TestFollowUser(t *testing.T) {
+	//Initialization
+	service.InitializeService()
+
+	tweet1 := domain.NewTweet("nportas", "Primer tweet")
+	tweet2 := domain.NewTweet("mercadolibre", "Segundo tweet")
+	tweet3 := domain.NewTweet("grupoesfera", "Tercer tweet")
+
+	service.PublishTweet(tweet1)
+	service.PublishTweet(tweet2)
+	service.PublishTweet(tweet3)
+
+	//Operation
+	service.Follow("grupoesfera", "nportas")
+	service.Follow("grupoesfera", "mercadolibre")
+
+	time_line := service.GetTimeLine("grupoesfera")
+
+	if len(time_line) != 3 {
+		t.Errorf("Expected lenght is 2 but was: %v", len(time_line))
+		return
+	}
+
+	if !isValidTweet(t, time_line[0], 0, "nportas", "Primer tweet") {
+		return
+	}
+	if !isValidTweet(t, time_line[1], 1, "mercadolibre", "Segundo tweet") {
+		return
+	}
+
+}
+
 func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user, text string) bool {
 
 	if tweet.Id != id {

@@ -8,13 +8,13 @@ import (
 )
 
 var tweets []*domain.Tweet
-var tweets_map map[string][]*domain.Tweet
+var users map[string]*domain.User
 var id int
 
 func InitializeService() {
 
 	tweets = make([]*domain.Tweet, 0)
-	tweets_map = make(map[string][]*domain.Tweet)
+	users = make(map[string]*domain.User)
 	id = 0
 
 }
@@ -31,7 +31,16 @@ func PublishTweet(tweet *domain.Tweet) (int, error) {
 	}
 	tweet.Id = id
 	tweets = append(tweets, tweet)
-	tweets_map[tweet.User] = append(tweets_map[tweet.User], tweet)
+	u, ok := users[tweet.User]
+
+	if ok {
+		u.Tweets = append(u.Tweets, tweet)
+	} else {
+		user := domain.NewUser(tweet.User)
+		user.Tweets = append(user.Tweets, tweet)
+		users[user.Name] = user
+	}
+
 	id = id + 1
 
 	return tweet.Id, nil
@@ -59,14 +68,42 @@ func GetTweetById(id int) *domain.Tweet {
 
 func CleanTweets() {
 	tweets = make([]*domain.Tweet, 0)
-	tweets_map = make(map[string][]*domain.Tweet)
+	users = make(map[string]*domain.User)
 	id = 0
 }
 
 func CountTweetsByUser(user string) int {
-	return len(tweets_map[user])
+	return len(users[user].Tweets)
 }
 
 func GetTweetsByUser(user string) []*domain.Tweet {
-	return tweets_map[user]
+	return users[user].Tweets
+}
+
+func Follow(user, userToFollow string) error {
+	u1, ok := users[user]
+	if !ok {
+		return fmt.Errorf("User does not exist")
+	}
+	u2, ok2 := users[userToFollow]
+	if !ok2 {
+		return fmt.Errorf("User to follow does not exist")
+	}
+	u1.Following = append(u1.Following, u2)
+	return nil
+}
+
+func GetTimeLine(user string) []*domain.Tweet {
+	followingTweets := make([]*domain.Tweet, 0)
+	u, ok := users[user]
+
+	if ok {
+
+		for _, following := range u.Following {
+			followingTweets = append(followingTweets, following.Tweets...)
+		}
+		followingTweets = append(followingTweets, u.Tweets...)
+	}
+
+	return followingTweets
 }
