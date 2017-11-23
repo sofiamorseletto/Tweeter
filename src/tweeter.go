@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/Tweeter/src/domain"
 	"github.com/Tweeter/src/service"
 	"github.com/abiosoft/ishell"
@@ -10,6 +12,7 @@ func main() {
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >>")
 	shell.Print("Type 'help' to know commands\n")
+	service.InitializeService()
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
@@ -92,6 +95,64 @@ func main() {
 
 			c.Print("Tweets deleted\n")
 
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "searchTweetsByUser",
+		Help: "Searches tweets by user",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Println("Enter the user: ")
+
+			user := c.ReadLine()
+
+			for _, tweet := range service.GetTweetsByUser(user) {
+				c.Println(tweet.Text)
+			}
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "countTweetsByUser",
+		Help: "Counts tweets by user",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Println("Enter the user: ")
+
+			user := c.ReadLine()
+
+			c.Println(service.CountTweetsByUser(user))
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "getTweetById",
+		Help: "Returns tweet with the same id",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Println("Enter the id: ")
+
+			in := c.ReadLine()
+			id, err := strconv.Atoi(in)
+
+			if err != nil {
+				// handle error
+				c.Println("Invalid id")
+			} else {
+				c.Println(service.GetTweetById(id).Text)
+			}
 			return
 		},
 	})
