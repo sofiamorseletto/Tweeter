@@ -8,11 +8,13 @@ import (
 )
 
 var tweets []*domain.Tweet
+var tweets_map map[string][]*domain.Tweet
 var id int
 
 func InitializeService() {
 
 	tweets = make([]*domain.Tweet, 0)
+	tweets_map = make(map[string][]*domain.Tweet)
 	id = 0
 
 }
@@ -29,6 +31,7 @@ func PublishTweet(tweet *domain.Tweet) (int, error) {
 	}
 	tweet.Id = id
 	tweets = append(tweets, tweet)
+	tweets_map[tweet.User] = append(tweets_map[tweet.User], tweet)
 	id = id + 1
 
 	return tweet.Id, nil
@@ -56,16 +59,14 @@ func GetTweetById(id int) *domain.Tweet {
 
 func CleanTweets() {
 	tweets = make([]*domain.Tweet, 0)
+	tweets_map = make(map[string][]*domain.Tweet)
 	id = 0
 }
 
 func CountTweetsByUser(user string) int {
-	cant := 0
+	return len(tweets_map[user])
+}
 
-	for _, tweet := range tweets {
-		if tweet.User == user {
-			cant = cant + 1
-		}
-	}
-	return cant
+func GetTweetsByUser(user string) []*domain.Tweet {
+	return tweets_map[user]
 }
