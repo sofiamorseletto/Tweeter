@@ -54,7 +54,7 @@ func main() {
 			tweet := tw.GetTweet()
 
 			if tweet != nil {
-				c.Println(tweet.Text)
+				c.Println(tweet)
 			} else {
 				c.Println("")
 			}
@@ -74,7 +74,7 @@ func main() {
 
 			if tweets != nil {
 				for _, tweet := range tweets {
-					c.Println(tweet.Text)
+					c.Println(tweet)
 				}
 			} else {
 				c.Println("")

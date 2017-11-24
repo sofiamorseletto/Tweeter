@@ -328,3 +328,64 @@ func TestCanGetTrendingTopic(t *testing.T) {
 	}
 
 }
+
+func TestSendDirectMessage(t *testing.T) {
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "Hola va"
+	secondText := "Hola como va"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(anotherUser, secondText)
+
+	tweetManager.PublishTweet(tweet)
+	tweetManager.PublishTweet(secondTweet)
+
+	//Operation
+	tweetManager.SendDirectMessage(user, anotherUser, tweet)
+
+	//Validation
+	if len(tweetManager.GetAllDirectMessages(anotherUser)) != 1 {
+		t.Errorf("Expected len of direct messages was 1 but is %v", len(tweetManager.GetAllDirectMessages(anotherUser)))
+		return
+	}
+
+	if tweetManager.GetAllDirectMessages(anotherUser)[0].Text != "Hola va" {
+		t.Errorf("Expected len of direct messages was Hola va but is %v", tweetManager.GetAllDirectMessages(anotherUser)[0].Text)
+		return
+	}
+}
+
+func TestReadDirectMessage(t *testing.T) {
+	// Initialization
+	tweetManager := service.NewTweetManager()
+
+	var tweet, secondTweet *domain.Tweet
+
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "Hola va"
+	secondText := "Hola como va"
+
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(anotherUser, secondText)
+
+	id, _ := tweetManager.PublishTweet(tweet)
+	tweetManager.PublishTweet(secondTweet)
+
+	//Operation
+	tweetManager.SendDirectMessage(user, anotherUser, tweet)
+	tweetManager.ReadDirectMessage(anotherUser, id)
+
+	//Validation
+	if tweetManager.GetAllDirectMessages(anotherUser)[0].Read != true {
+		t.Errorf("Expected status of messages was true but is %v", tweetManager.GetAllDirectMessages(anotherUser)[0].Read)
+		return
+	}
+
+}

@@ -1,16 +1,18 @@
 package domain
 
 type User struct {
-	Name      string
-	Tweets    []*Tweet
-	Following []*User
+	Name           string
+	Tweets         []*Tweeter
+	Following      []*User
+	DirectMessages []*Tweeter
 }
 
 func NewUser(name string) *User {
 	u := User{
 		name,
-		make([]*Tweet, 0),
+		make([]*Tweeter, 0),
 		make([]*User, 0),
+		make([]*Tweeter, 0),
 	}
 
 	return &u

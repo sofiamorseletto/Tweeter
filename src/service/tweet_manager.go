@@ -95,12 +95,7 @@ func (tweetManager *TweetManager) GetTweets() []*domain.Tweet {
 }
 
 func (tweetManager *TweetManager) GetTweetById(id int) *domain.Tweet {
-	for _, tweet := range tweetManager.tweets {
-		if tweet.Id == id {
-			return tweet
-		}
-	}
-	return nil
+	return tweetManager.getMessageById(id, tweetManager.tweets)
 }
 
 func (tweetManager *TweetManager) CleanTweets() {
@@ -147,4 +142,35 @@ func (tweetManager *TweetManager) GetTimeLine(user string) []*domain.Tweet {
 
 func (tweetManager *TweetManager) GetTrendingTopic() (string, string) {
 	return tweetManager.topics[0].word, tweetManager.topics[1].word
+}
+
+func (tweetManager *TweetManager) SendDirectMessage(user, userToMsg string, message *domain.Tweet) error {
+	_, ok1 := tweetManager.users[user]
+	_, ok2 := tweetManager.users[userToMsg]
+
+	if ok1 && ok2 {
+		tweetManager.users[userToMsg].DirectMessages = append(tweetManager.users[userToMsg].DirectMessages, message)
+		return nil
+	}
+
+	return fmt.Errorf("The user does not exist")
+
+}
+
+func (tweetManager *TweetManager) GetAllDirectMessages(user string) []*domain.Tweet {
+	return tweetManager.users[user].DirectMessages
+}
+
+func (tweetManager *TweetManager) ReadDirectMessage(user string, id int) {
+	message := tweetManager.getMessageById(id, tweetManager.users[user].DirectMessages)
+	message.Read = true
+}
+
+func (tweetManager *TweetManager) getMessageById(id int, tweets []*domain.Tweet) *domain.Tweet {
+	for _, tweet := range tweets {
+		if tweet.Id == id {
+			return tweet
+		}
+	}
+	return nil
 }
