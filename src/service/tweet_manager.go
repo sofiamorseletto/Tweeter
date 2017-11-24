@@ -8,11 +8,17 @@ import (
 	"github.com/Tweeter/src/domain"
 )
 
+type TrendingTopic struct {
+	word    string
+	counter int
+}
+
 type TweetManager struct {
 	tweets []*domain.Tweet
 	users  map[string]*domain.User
 	words  map[string]int
 	id     int
+	topics []*TrendingTopic
 }
 
 func NewTweetManager() *TweetManager {
@@ -21,7 +27,11 @@ func NewTweetManager() *TweetManager {
 		make(map[string]*domain.User),
 		make(map[string]int),
 		0,
+		make([]*TrendingTopic, 2),
 	}
+	tm.topics[0] = &TrendingTopic{"", 0}
+	tm.topics[1] = &TrendingTopic{"", 0}
+
 	return &tm
 }
 
@@ -49,7 +59,23 @@ func (tweetManager *TweetManager) PublishTweet(tweet *domain.Tweet) (int, error)
 
 	tweetWords := strings.Fields(tweet.Text)
 	for _, word := range tweetWords {
-		tweetManager.words[word] = tweetManager.words[word] + 1
+		cant := tweetManager.words[word]
+		cant = cant + 1
+		tweetManager.words[word] = cant
+		if cant > tweetManager.topics[0].counter && word != tweetManager.topics[0].word {
+			w := TrendingTopic{
+				word,
+				cant,
+			}
+			tweetManager.topics[1] = tweetManager.topics[0]
+			tweetManager.topics[0] = &w
+		} else if cant > tweetManager.topics[1].counter && word != tweetManager.topics[0].word {
+			w := TrendingTopic{
+				word,
+				cant,
+			}
+			tweetManager.topics[1] = &w
+		}
 	}
 
 	tweetManager.id++
@@ -120,5 +146,5 @@ func (tweetManager *TweetManager) GetTimeLine(user string) []*domain.Tweet {
 }
 
 func (tweetManager *TweetManager) GetTrendingTopic() (string, string) {
-
+	return tweetManager.topics[0].word, tweetManager.topics[1].word
 }

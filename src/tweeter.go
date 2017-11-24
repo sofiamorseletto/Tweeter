@@ -12,7 +12,7 @@ func main() {
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >>")
 	shell.Print("Type 'help' to know commands\n")
-	service.InitializeService()
+	tw := service.NewTweetManager()
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
@@ -33,7 +33,7 @@ func main() {
 
 			tweet = domain.NewTweet(user, text)
 
-			id, err := service.PublishTweet(tweet)
+			id, err := tw.PublishTweet(tweet)
 			if err != nil {
 				c.Print("Error publishing tweet:", err)
 			} else {
@@ -51,7 +51,7 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			tweet := service.GetTweet()
+			tweet := tw.GetTweet()
 
 			if tweet != nil {
 				c.Println(tweet.Text)
@@ -70,7 +70,7 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			tweets := service.GetTweets()
+			tweets := tw.GetTweets()
 
 			if tweets != nil {
 				for _, tweet := range tweets {
@@ -91,7 +91,7 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			service.CleanTweets()
+			tw.CleanTweets()
 
 			c.Print("Tweets deleted\n")
 
@@ -110,7 +110,7 @@ func main() {
 
 			user := c.ReadLine()
 
-			for _, tweet := range service.GetTweetsByUser(user) {
+			for _, tweet := range tw.GetTweetsByUser(user) {
 				c.Println(tweet.Text)
 			}
 
@@ -129,7 +129,7 @@ func main() {
 
 			user := c.ReadLine()
 
-			c.Println(service.CountTweetsByUser(user))
+			c.Println(tw.CountTweetsByUser(user))
 
 			return
 		},
@@ -151,8 +151,24 @@ func main() {
 				// handle error
 				c.Println("Invalid id")
 			} else {
-				c.Println(service.GetTweetById(id).Text)
+				c.Println(tw.GetTweetById(id).Text)
 			}
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "getTrendingTopics",
+		Help: "Gets the first two most named words",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			primera, segunda := tw.GetTrendingTopic()
+
+			c.Println("Primera: ", primera)
+			c.Println("Segunda: ", segunda)
+
 			return
 		},
 	})
