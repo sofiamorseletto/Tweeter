@@ -44,9 +44,12 @@ func NewFileTweetWriter() *FileTweetWriter {
 	return writer
 }
 
-func (writer *FileTweetWriter) WriteTweet(tweet domain.Tweeter) {
-	if writer.file != nil {
-		byteSlice := []byte(tweet.PrintableTweet() + "\n")
-		writer.file.Write(byteSlice)
+func (writer *FileTweetWriter) WriteTweet(tweets chan domain.Tweeter, quit chan bool) {
+	for tweet := range tweets {
+		if writer.file != nil {
+			byteSlice := []byte(tweet.PrintableTweet() + "\n")
+			writer.file.Write(byteSlice)
+		}
 	}
+	quit <- true
 }
