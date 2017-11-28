@@ -3,6 +3,8 @@ package main
 import (
 	"strconv"
 
+	"github.com/Tweeter/src/rest"
+
 	"github.com/Tweeter/src/domain"
 	"github.com/Tweeter/src/service"
 	"github.com/abiosoft/ishell"
@@ -12,16 +14,22 @@ func main() {
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >>")
 	shell.Print("Type 'help' to know commands\n")
-	tw := service.NewTweetManager()
+	memoryWriter := service.NewMemoryTweetWriter()
+	channelWriter := service.NewChannelTweetWriter(memoryWriter)
+	tw := service.NewTweetManager(channelWriter)
+	server := rest.NewGinServer(tw)
+	server.StartGinServer()
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
 		Help: "Publishes a tweet",
 		Func: func(c *ishell.Context) {
-			var tweet *domain.Tweet
+			var tweet domain.Tweeter
 			var id int
 
 			defer c.ShowPrompt(true)
+
+			quit := make(chan bool)
 
 			c.Print("Write your user: ")
 
@@ -31,9 +39,9 @@ func main() {
 
 			text := c.ReadLine()
 
-			tweet = domain.NewTweet(user, text)
+			tweet = domain.NewTextTweet(user, text)
 
-			id, err := tw.PublishTweet(tweet)
+			id, err, _ := tw.PublishTweet(tweet, quit)
 			if err != nil {
 				c.Print("Error publishing tweet:", err)
 			} else {
@@ -111,7 +119,7 @@ func main() {
 			user := c.ReadLine()
 
 			for _, tweet := range tw.GetTweetsByUser(user) {
-				c.Println(tweet.Text)
+				c.Println(tweet.GetText())
 			}
 
 			return
@@ -151,7 +159,7 @@ func main() {
 				// handle error
 				c.Println("Invalid id")
 			} else {
-				c.Println(tw.GetTweetById(id).Text)
+				c.Println(tw.GetTweetById(id).GetText())
 			}
 			return
 		},

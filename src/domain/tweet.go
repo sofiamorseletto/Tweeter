@@ -4,6 +4,13 @@ import "time"
 import "fmt"
 
 type Tweeter interface {
+	GetUser() string
+	GetText() string
+	GetId() int
+	GetDate() *time.Time
+	GetRead() bool
+	SetId(id int)
+	SetRead(read bool)
 	PrintableTweet() string
 }
 
@@ -38,6 +45,34 @@ func (tweet *TextTweet) String() string {
 	return tweet.PrintableTweet()
 }
 
+func (tweet *TextTweet) GetId() int {
+	return tweet.Id
+}
+
+func (tweet *TextTweet) GetUser() string {
+	return tweet.User
+}
+
+func (tweet *TextTweet) GetText() string {
+	return tweet.Text
+}
+
+func (tweet *TextTweet) GetDate() *time.Time {
+	return tweet.Date
+}
+
+func (tweet *TextTweet) GetRead() bool {
+	return tweet.Read
+}
+
+func (tweet *TextTweet) SetId(id int) {
+	tweet.Id = id
+}
+
+func (tweet *TextTweet) SetRead(read bool) {
+	tweet.Read = read
+}
+
 type ImageTweet struct {
 	TextTweet
 	ImageUrl string
@@ -69,6 +104,34 @@ func (tweet *ImageTweet) String() string {
 	return tweet.PrintableTweet()
 }
 
+func (tweet *ImageTweet) GetId() int {
+	return tweet.Id
+}
+
+func (tweet *ImageTweet) GetUser() string {
+	return tweet.User
+}
+
+func (tweet *ImageTweet) GetText() string {
+	return tweet.Text
+}
+
+func (tweet *ImageTweet) GetDate() *time.Time {
+	return tweet.Date
+}
+
+func (tweet *ImageTweet) GetRead() bool {
+	return tweet.Read
+}
+
+func (tweet *ImageTweet) SetId(id int) {
+	tweet.Id = id
+}
+
+func (tweet *ImageTweet) SetRead(read bool) {
+	tweet.Read = read
+}
+
 type QuoteTweet struct {
 	TextTweet
 	Quote Tweeter
@@ -98,4 +161,32 @@ func (tweet *QuoteTweet) PrintableTweet() string {
 
 func (tweet *QuoteTweet) String() string {
 	return tweet.PrintableTweet()
+}
+
+func (tweet *QuoteTweet) GetId() int {
+	return tweet.Id
+}
+
+func (tweet *QuoteTweet) GetUser() string {
+	return tweet.User
+}
+
+func (tweet *QuoteTweet) GetText() string {
+	return tweet.Text
+}
+
+func (tweet *QuoteTweet) GetDate() *time.Time {
+	return tweet.Date
+}
+
+func (tweet *QuoteTweet) GetRead() bool {
+	return tweet.Read
+}
+
+func (tweet *QuoteTweet) SetId(id int) {
+	tweet.Id = id
+}
+
+func (tweet *QuoteTweet) SetRead(read bool) {
+	tweet.Read = read
 }
